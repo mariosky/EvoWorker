@@ -8,8 +8,8 @@ r = requests.delete('http://127.0.0.1:3000/evospace/test_pop')
 print "Delete population"
 
 
-#Create population
-r = requests.post('http://127.0.0.1:3000/evospace/test_pop/initialize', data = {'space':'test_pop'})
+#Initialize population
+r = requests.post('http://127.0.0.1:3000/evospace/test_pop/initialize')
 print "Create population", r.text
 
 
