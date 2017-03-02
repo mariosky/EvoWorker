@@ -1,7 +1,6 @@
 
 import random
 
-
 from deap import base
 from deap import creator
 from deap import tools
@@ -14,7 +13,7 @@ toolbox = base.Toolbox()
 
 toolbox.register("attr_bool", random.randint, 0, 1)
 toolbox.register("individual", tools.initRepeat, creator.Individual,
-    toolbox.attr_bool, 100)
+    toolbox.attr_bool, 1000)
 
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
@@ -28,21 +27,30 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 
 space = EvoSpace('127.0.0.1:3000/evospace','test_pop')
 
-print space.get(100)
+
 
 def initialize(n=300):
+    space.delete()
+    space.initialize()
     pop = toolbox.population(n=300)
+    init_pop = [{"chromosome": ind[:], "id": None, "fitness": {"DefaultContext": 0.0}} for ind in pop]
+    space.post_subpop(init_pop)
 
 
 
 
 def main():
     random.seed(64)
-    pop = toolbox.population(n=300)
+#   pop = toolbox.population(n=300)
+    #CXPB, MUTPB, NGEN = .5, 0.2, 20
+    CXPB, MUTPB, NGEN = random.random(), random.random(), random.randint(15,40)
+    print CXPB, MUTPB, NGEN
 
-    CXPB, MUTPB, NGEN = 0.5, 0.2, 40
+    #print("Start of evolution")
 
-    print("Start of evolution")
+    evospace_sample = space.get_sample(100)
+    pop = [ creator.Individual( cs['chromosome']) for cs in evospace_sample['sample']]
+
 
     # Evaluate the entire population
     fitnesses = list(map(toolbox.evaluate, pop))
@@ -53,7 +61,7 @@ def main():
 
     # Begin the evolution
     for g in range(NGEN):
-        print("-- Generation %i --" % g)
+        #print("-- Generation %i --" % g)
 
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
@@ -85,7 +93,7 @@ def main():
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
 
-        print("  Evaluated %i individuals" % len(invalid_ind))
+        #print("  Evaluated %i individuals" % len(invalid_ind))
 
         # The population is entirely replaced by the offspring
         pop[:] = offspring
@@ -98,16 +106,25 @@ def main():
         sum2 = sum(x*x for x in fits)
         std = abs(sum2 / length - mean**2)**0.5
 
-        print("  Min %s" % min(fits))
-        print("  Max %s" % max(fits))
-        print("  Avg %s" % mean)
-        print("  Std %s" % std)
+        #print("  Min %s" % min(fits))
+        #print("  Max %s" % max(fits))
+        #print("  Avg %s" % mean)
+        #print("  Std %s" % std)
 
     print("-- End of (successful) evolution --")
 
     best_ind = tools.selBest(pop, 1)[0]
-    print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
+    print("Best individual is %s" % (best_ind.fitness.values ))
+
+    final_pop = [{"chromosome": ind[:], "id": None,
+               "fitness": {"DefaultContext": ind.fitness.values[0]}} for ind in pop]
+
+    evospace_sample['sample'] = final_pop
+    space.put_sample(evospace_sample)
 
 if __name__ == "__main__":
-
-    main()
+    print space.url
+    print initialize(1000)
+    for i  in range(100):
+        print i
+        main()
