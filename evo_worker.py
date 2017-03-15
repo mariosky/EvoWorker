@@ -48,7 +48,6 @@ class GA_Worker:
         self.space.initialize()
         pop = self.toolbox.population(n)
         init_pop = [{"chromosome": ind[:], "id": None, "fitness": {"DefaultContext": 0.0}} for ind in pop]
-        print 'init_pop'
         self.space.post_subpop(init_pop)
 
     def run(self,i):
@@ -71,7 +70,8 @@ class GA_Worker:
         for ind, fit in zip(pop, fitnesses):
             ind.fitness.values = fit
 
-        print("  Evaluated %i individuals" % len(pop))
+        # print("  Evaluated %i individuals" % len(pop))
+        params = { 'CXPB':CXPB,'MUTPB':MUTPB, 'NGEN' : NGEN, 'sample_size': self.conf['sample_size'] }
 
 
 
@@ -144,6 +144,10 @@ class GA_Worker:
                    "fitness": {"DefaultContext": ind.fitness.values[0],"score":ind.fitness.values[0]}} for ind in pop]
 
         evospace_sample['sample'] = final_pop
+        if 'benchmark' in self.conf:
+            experiment_id = 'experiment_id' in conf and  conf['experiment_id']  or 0
+            evospace_sample['benchmark_data'] = {'params':params, 'Fevals':evals,'algorithm': 'GA',
+                    'benchmark':self.conf['function'], 'instance': self.conf['instance'], 'worker_id':str( self.worker_uuid), 'experiment_id':experiment_id, 'fopt':self.function.getfopt() }
         self.space.put_sample(evospace_sample)
 
         if (best_ind.fitness.values[0] <= self.function.getfopt() + 1e-8) or self.FC >= self.maximum_function_evaluations:
@@ -156,11 +160,13 @@ if __name__ == "__main__":
     conf = {}
     conf['function'] = 3
     conf['instance'] = 1
-    conf['sample_size'] = 30
+    conf['sample_size'] = 300
     conf['FEmax'] = 500000
     conf['evospace_url'] = '127.0.0.1:3000/evospace'
     conf['pop_name'] = 'test_pop'
     conf['max_samples'] = 100
+    conf['benchmark'] = True
+    conf['experiment_id'] = 4
 
 
     worker = GA_Worker(conf)
