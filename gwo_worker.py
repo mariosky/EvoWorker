@@ -2,6 +2,7 @@ import random
 import bbobbenchmarks as bn
 import uuid
 import os
+import numpy as np
 
 from EvoloPy import GWO as gwo
 
@@ -20,21 +21,28 @@ class GWO_Worker:
 
         self.space = EvoSpace(self.conf['evospace_url'], self.conf['pop_name'])
 
+        self.evospace_sample = None
+
     def setup(self):
         pass
         #evospace_sample = self.space.get_sample(self.conf['sample_size'])
 
+    def get(self):
+        self.evospace_sample = self.space.get_sample(self.conf['sample_size'])
+        pop = [cs['chromosome'] for cs in self.evospace_sample['sample']]
+        return np.array(pop)
 
-    def run(self):
+
+    def run(self, pop):
         self.function.__name__ = "F%s instance %s" % (self.conf['function'], self.conf['instance'])
-        gwo.GWO(objf=self.function, lb=conf['lb'], ub=conf['ub'], dim=self.conf['dim'], SearchAgents_no=conf['sample_size'], Max_iter=conf['NGEN'])
+        gwo.GWO(objf=self.function, lb=conf['lb'], ub=conf['ub'], dim=self.conf['dim'], SearchAgents_no=conf['sample_size'], Max_iter=conf['NGEN'], Positions=pop)
 
 
 if __name__ == "__main__":
     conf = {}
     conf['function'] = 3
     conf['instance'] = 1
-    conf['dim'] = 1
+    conf['dim'] = 5
     conf['sample_size'] = 5
     conf['FEmax'] = 500000
     conf['evospace_url'] = 'EVOSPACE_URL' in os.environ and os.environ['EVOSPACE_URL'] or '127.0.0.1:3000/evospace'
@@ -48,10 +56,11 @@ if __name__ == "__main__":
 
 
     worker = GWO_Worker(conf)
+    pop = worker.get()
     print "Ready"
     for i  in range(conf['max_samples']):
         print i ,
-        print worker.run()
+        print worker.run(pop)
 
 
 #    for i in range(conf['max_samples']):

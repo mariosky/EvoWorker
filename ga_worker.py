@@ -29,7 +29,7 @@ class GA_Worker:
         self.toolbox = base.Toolbox()
         self.toolbox.register("attr_float", random.uniform, -5, 5)
         self.toolbox.register("individual", tools.initRepeat, creator.Individual,
-                              self.toolbox.attr_float, 10)
+                              self.toolbox.attr_float, self.conf['dim'])
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
         self.toolbox.register("evaluate", self.eval)
         self.toolbox.register("mate", tools.cxTwoPoint)
