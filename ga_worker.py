@@ -19,18 +19,17 @@ class GA_Worker:
         self.toolbox = base.Toolbox()
         self.FC = 0
         self.worker_uuid = uuid.uuid1()
-
         self.space = EvoSpace(self.conf['evospace_url'], self.conf['pop_name'])
+        self.params = None
+        self.evospace_sample = None
 
     def setup(self):
         creator.create("FitnessMin", base.Fitness, weights=(-1.0,))     #Minimizing Negative
         creator.create("Individual", list, typecode='d', fitness=creator.FitnessMin)
-
         self.toolbox = base.Toolbox()
         self.toolbox.register("attr_float", random.uniform, -5, 5)
         self.toolbox.register("individual", tools.initRepeat, creator.Individual,
                               self.toolbox.attr_float, 10)
-
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
         self.toolbox.register("evaluate", self.eval)
         self.toolbox.register("mate", tools.cxTwoPoint)
@@ -47,16 +46,31 @@ class GA_Worker:
         init_pop = [{"chromosome": ind[:], "id": None, "fitness": {"DefaultContext": 0.0}} for ind in pop]
         self.space.post_subpop(init_pop)
 
-    def run(self):
+    def get(self):
+        self.evospace_sample = self.space.get_sample(self.conf['sample_size'])
+        pop = [creator.Individual(cs['chromosome']) for cs in self.evospace_sample['sample']]
+        return pop
+
+    def put_back(self,pop):
+        final_pop = [{"chromosome": ind[:], "id": None,
+                      "fitness": {"DefaultContext": ind.fitness.values[0], "score": ind.fitness.values[0]}} for ind in
+                     pop]
+
+        self.evospace_sample['sample'] = final_pop
+
+        if 'benchmark' in self.conf:
+            experiment_id = 'experiment_id' in conf and conf['experiment_id'] or 0
+            self.evospace_sample['benchmark_data'] = {'params': self.params, 'evals': evals, 'algorithm': 'GA',
+                                                 'benchmark': self.conf['function'], 'instance': self.conf['instance'],
+                                                 'worker_id': str(self.worker_uuid), 'experiment_id': experiment_id,
+                                                 'fopt': self.function.getfopt()}
+        self.space.put_sample(self.evospace_sample)
+
+    def run(self, pop):
         evals = []
 
-        random.seed(i)
+        #random.seed(i)
         CXPB, MUTPB, NGEN = random.uniform(.8,1), random.uniform(.1,.6), random.randint(50,100)
-
-
-        evospace_sample = self.space.get_sample(self.conf['sample_size'])
-        pop = [ creator.Individual( cs['chromosome']) for cs in evospace_sample['sample']]
-
 
         # Evaluate the entire population
         fitnesses = list(map(self.toolbox.evaluate, pop))
@@ -64,13 +78,10 @@ class GA_Worker:
             ind.fitness.values = fit
 
         # print("  Evaluated %i individuals" % len(pop))
-        params = { 'CXPB':CXPB,'MUTPB':MUTPB, 'NGEN' : NGEN, 'sample_size': self.conf['sample_size'],
+        self.params = { 'CXPB':CXPB,'MUTPB':MUTPB, 'NGEN' : NGEN, 'sample_size': self.conf['sample_size'],
                    'crossover':'cxTwoPoint', 'mutation':'mutGaussian, mu=0, sigma=0.5, indpb=0.05',
                    'selection':'tools.selTournament, tournsize=12','init':'random:[-5,5]'
                    }
-
-
-
 
         # Begin the evolution
         for g in range(NGEN):
@@ -107,52 +118,23 @@ class GA_Worker:
                 ind.fitness.values = fit
 
             #print("  Evaluated %i individuals" % len(invalid_ind))
-
-
-
             self.FC = self.FC + len(invalid_ind)
-
-
 
             # The population is entirely replaced by the offspring
             pop[:] = offspring
 
             # Gather all the fitnesses in one list and print the stats
             fits = [ind.fitness.values[0] for ind in pop]
-
-            length = len(pop)
-            mean = sum(fits) / length
-            sum2 = sum(x*x for x in fits)
-            std = abs(sum2 / length - mean**2)**0.5
             evals.append((g, min(fits)))
 
-            #print("  Min %s" % min(fits))
-            #print("  Max %s" % max(fits))
-            #print("  Avg %s" % mean)
-            #print("  Std %s" % std)
-
-        # print("-- End of (successful) evolution --")
-
         best_ind = tools.selBest(pop, 1)[0]
-
-        print("Best individual is %s" % (best_ind.fitness.values )), '%+10.9e'% (best_ind.fitness.values[0] - self.function.getfopt()), self.FC,self.worker_uuid
-
-        final_pop = [{"chromosome": ind[:], "id": None,
-                   "fitness": {"DefaultContext": ind.fitness.values[0],"score":ind.fitness.values[0]}} for ind in pop]
-
-        evospace_sample['sample'] = final_pop
-        if 'benchmark' in self.conf:
-            experiment_id = 'experiment_id' in conf and  conf['experiment_id']  or 0
-            evospace_sample['benchmark_data'] = {'params':params, 'evals':evals,'algorithm': 'GA',
-                    'benchmark':self.conf['function'], 'instance': self.conf['instance'], 'worker_id':str( self.worker_uuid), 'experiment_id':experiment_id, 'fopt':self.function.getfopt() }
-        self.space.put_sample(evospace_sample)
-
         if (best_ind.fitness.values[0] <= self.function.getfopt() + 1e-8) or self.FC >= self.maximum_function_evaluations:
-            return True,evals
+            return True, evals,  pop, best_ind
         else:
-            return False,evals
+            return False,evals,  pop,  best_ind
 
 if __name__ == "__main__":
+
     conf = {}
     conf['function'] = 3
     conf['instance'] = 1
@@ -166,13 +148,16 @@ if __name__ == "__main__":
 
 
     worker = GA_Worker(conf)
+
     worker.setup()
     worker.initialize(1000)
-    print "Ready"
-    #for i  in range(conf['max_samples']):
-    #    print i ,
-    #    finished,evals = worker.run()
-    #    print evals
-    #    if finished:
-    #        break
+
+    for i  in range(conf['max_samples']):
+        print i ,
+        pop = worker.get()
+        finished, evals,  pop,  best_ind = worker.run(pop)
+        print   best_ind.fitness.values[0],  '%+10.9e'% (best_ind.fitness.values[0] - worker.function.getfopt() + 1e-8)
+        worker.put_back(pop)
+        if finished:
+            break
 

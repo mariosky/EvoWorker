@@ -27,7 +27,7 @@ class GWO_Worker:
 
     def run(self):
         self.function.__name__ = "F%s instance %s" % (self.conf['function'], self.conf['instance'])
-        gwo.GWO(objf=self.function, lb=-5, ub=+5, dim=self.conf['dim'], SearchAgents_no=5, Max_iter=10)
+        gwo.GWO(objf=self.function, lb=conf['lb'], ub=conf['ub'], dim=self.conf['dim'], SearchAgents_no=conf['sample_size'], Max_iter=conf['NGEN'])
 
 
 if __name__ == "__main__":
@@ -35,13 +35,16 @@ if __name__ == "__main__":
     conf['function'] = 3
     conf['instance'] = 1
     conf['dim'] = 1
-    conf['sample_size'] = 300
+    conf['sample_size'] = 5
     conf['FEmax'] = 500000
     conf['evospace_url'] = 'EVOSPACE_URL' in os.environ and os.environ['EVOSPACE_URL'] or '127.0.0.1:3000/evospace'
     conf['pop_name'] = 'POP_NAME' in os.environ and os.environ['POP_NAME'] or 'test_pop'
     conf['max_samples'] = 'MAX_SAMPLES' in os.environ and int(os.environ['MAX_SAMPLES']) or 1
     conf['benchmark'] = 'BENCHMARK' in os.environ
     conf['experiment_id'] = 'EXPERIMENT_ID' in os.environ and int(os.environ['EXPERIMENT_ID']) or str(uuid.uuid1())
+    conf['lb'] = 'LOWER_BOUND' in os.environ and int(os.environ['LOWER_BOUND']) or -5
+    conf['ub'] = 'UPPER_BOUND' in os.environ and int(os.environ['UPPER_BOUND']) or 5
+    conf['NGEN'] = 'NGEN' in os.environ and int(os.environ['NGEN']) or  10
 
 
     worker = GWO_Worker(conf)
@@ -49,3 +52,13 @@ if __name__ == "__main__":
     for i  in range(conf['max_samples']):
         print i ,
         print worker.run()
+
+
+#    for i in range(conf['max_samples']):
+#        print i,
+#        pop = worker.get()
+#        finished, evals, pop, best_ind = worker.run(pop)
+#        print   best_ind.fitness.values[0], '%+10.9e' % (best_ind.fitness.values[0] - worker.function.getfopt() + 1e-8)
+#        worker.put_back(pop)
+#        if finished:
+#            break
