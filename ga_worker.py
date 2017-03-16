@@ -1,8 +1,7 @@
-
 import random
 import bbobbenchmarks as bn
 import uuid
-
+import os
 
 from deap import base
 from deap import creator
@@ -35,10 +34,8 @@ class GA_Worker:
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
         self.toolbox.register("evaluate", self.eval)
         self.toolbox.register("mate", tools.cxTwoPoint)
-        # toolbox.register("mutate",tools.mutGaussian , mu=0, sigma=0.6, indpb=0.05)
         self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=0.5, indpb=0.05)
         self.toolbox.register("select", tools.selTournament, tournsize=12)
-
 
     def eval(self, individual):
         return  self.function(individual),
@@ -50,16 +47,12 @@ class GA_Worker:
         init_pop = [{"chromosome": ind[:], "id": None, "fitness": {"DefaultContext": 0.0}} for ind in pop]
         self.space.post_subpop(init_pop)
 
-    def run(self,i):
+    def run(self):
         evals = []
 
         random.seed(i)
-        #   pop = toolbox.population(n=300)
-        #CXPB, MUTPB, NGEN = .5, 0.2, 20
         CXPB, MUTPB, NGEN = random.uniform(.8,1), random.uniform(.1,.6), random.randint(50,100)
-        print CXPB, MUTPB, NGEN
 
-        #print("Start of evolution")
 
         evospace_sample = self.space.get_sample(self.conf['sample_size'])
         pop = [ creator.Individual( cs['chromosome']) for cs in evospace_sample['sample']]
@@ -71,7 +64,10 @@ class GA_Worker:
             ind.fitness.values = fit
 
         # print("  Evaluated %i individuals" % len(pop))
-        params = { 'CXPB':CXPB,'MUTPB':MUTPB, 'NGEN' : NGEN, 'sample_size': self.conf['sample_size'] }
+        params = { 'CXPB':CXPB,'MUTPB':MUTPB, 'NGEN' : NGEN, 'sample_size': self.conf['sample_size'],
+                   'crossover':'cxTwoPoint', 'mutation':'mutGaussian, mu=0, sigma=0.5, indpb=0.05',
+                   'selection':'tools.selTournament, tournsize=12','init':'random:[-5,5]'
+                   }
 
 
 
@@ -113,7 +109,8 @@ class GA_Worker:
             #print("  Evaluated %i individuals" % len(invalid_ind))
 
 
-            self.FC = self.FC + len(pop)
+
+            self.FC = self.FC + len(invalid_ind)
 
 
 
@@ -146,7 +143,7 @@ class GA_Worker:
         evospace_sample['sample'] = final_pop
         if 'benchmark' in self.conf:
             experiment_id = 'experiment_id' in conf and  conf['experiment_id']  or 0
-            evospace_sample['benchmark_data'] = {'params':params, 'Fevals':evals,'algorithm': 'GA',
+            evospace_sample['benchmark_data'] = {'params':params, 'evals':evals,'algorithm': 'GA',
                     'benchmark':self.conf['function'], 'instance': self.conf['instance'], 'worker_id':str( self.worker_uuid), 'experiment_id':experiment_id, 'fopt':self.function.getfopt() }
         self.space.put_sample(evospace_sample)
 
@@ -156,27 +153,26 @@ class GA_Worker:
             return False,evals
 
 if __name__ == "__main__":
-
     conf = {}
     conf['function'] = 3
     conf['instance'] = 1
     conf['sample_size'] = 300
     conf['FEmax'] = 500000
-    conf['evospace_url'] = '127.0.0.1:3000/evospace'
-    conf['pop_name'] = 'test_pop'
-    conf['max_samples'] = 100
-    conf['benchmark'] = True
-    conf['experiment_id'] = 4
+    conf['evospace_url'] = 'EVOSPACE_URL' in os.environ and os.environ['EVOSPACE_URL'] or '127.0.0.1:3000/evospace'
+    conf['pop_name'] = 'POP_NAME' in os.environ and os.environ['POP_NAME'] or 'test_pop'
+    conf['max_samples'] = 'MAX_SAMPLES' in os.environ and int(os.environ['MAX_SAMPLES']) or 10
+    conf['benchmark'] = 'BENCHMARK' in os.environ
+    conf['experiment_id'] = 'EXPERIMENT_ID' in os.environ and int(os.environ['EXPERIMENT_ID']) or str(uuid.uuid1())
 
 
     worker = GA_Worker(conf)
     worker.setup()
     worker.initialize(1000)
     print "Ready"
-    for i  in range(100):
-        print i ,
-        finished,evals = worker.run(i)
-        print evals
-        if finished:
-            break
+    #for i  in range(conf['max_samples']):
+    #    print i ,
+    #    finished,evals = worker.run()
+    #    print evals
+    #    if finished:
+    #        break
 
