@@ -125,7 +125,7 @@ class GA_Worker:
 
             # Gather all the fitnesses in one list and print the stats
             fits = [ind.fitness.values[0] for ind in pop]
-            evals.append((g, min(fits)))
+            evals.append((g, min(fits),tools.selBest(pop, 1)[0] ))
 
         best_ind = tools.selBest(pop, 1)[0]
         if (best_ind.fitness.values[0] <= self.function.getfopt() + 1e-8) or self.FC >= self.maximum_function_evaluations:
@@ -138,6 +138,7 @@ if __name__ == "__main__":
     conf = {}
     conf['function'] = 3
     conf['instance'] = 1
+    conf['dim'] = 5
     conf['sample_size'] = 300
     conf['FEmax'] = 500000
     conf['evospace_url'] = 'EVOSPACE_URL' in os.environ and os.environ['EVOSPACE_URL'] or '127.0.0.1:3000/evospace'
@@ -145,19 +146,21 @@ if __name__ == "__main__":
     conf['max_samples'] = 'MAX_SAMPLES' in os.environ and int(os.environ['MAX_SAMPLES']) or 10
     conf['benchmark'] = 'BENCHMARK' in os.environ
     conf['experiment_id'] = 'EXPERIMENT_ID' in os.environ and int(os.environ['EXPERIMENT_ID']) or str(uuid.uuid1())
-
+    conf['experiment_id'] = 1
 
     worker = GA_Worker(conf)
 
     worker.setup()
-    worker.initialize(1000)
+    worker.initialize(200)
 
-    for i  in range(conf['max_samples']):
-        print i ,
-        pop = worker.get()
-        finished, evals,  pop,  best_ind = worker.run(pop)
-        print   best_ind.fitness.values[0],  '%+10.9e'% (best_ind.fitness.values[0] - worker.function.getfopt() + 1e-8)
-        worker.put_back(pop)
-        if finished:
-            break
+    # for i  in range(conf['max_samples']):
+    #     print i ,
+    #     pop = worker.get()
+    #     finished, evals,  pop,  best_ind = worker.run(pop)
+    #     print   best_ind.fitness.values[0],  '%+10.9e'% (best_ind.fitness.values[0] - worker.function.getfopt() + 1e-8)
+    #     for e in evals:
+    #         print e
+    #     worker.put_back(pop)
+    #     if finished:
+    #         break
 
