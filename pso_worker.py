@@ -2,7 +2,7 @@ import uuid
 import os
 import numpy as np
 
-from EvoloPy import GWO as gwo
+from EvoloPy import PSO as pso
 from worker import  Worker
 
 class GWO_Worker(Worker):
@@ -36,7 +36,7 @@ class GWO_Worker(Worker):
 
     def run(self, pop):
         self.function.__name__ = "F%s instance %s" % (self.conf['function'], self.conf['instance'])
-        return gwo.GWO(objf=self.function, lb=conf['lb'], ub=conf['ub'], dim=self.conf['dim'], SearchAgents_no=conf['sample_size'], Max_iter=conf['NGEN'], Positions=pop, fopt=self.function.getfopt())
+        return pso.PSO(objf=self.function, lb=conf['lb'], ub=conf['ub'], dim=self.conf['dim'], PopSize=conf['sample_size'], iters=conf['NGEN'], pos=pop, fopt=self.function.getfopt())
 
 
 if __name__ == "__main__":
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     conf['experiment_id'] = 'EXPERIMENT_ID' in os.environ and int(os.environ['EXPERIMENT_ID']) or str(uuid.uuid1())
     conf['lb'] = 'LOWER_BOUND' in os.environ and int(os.environ['LOWER_BOUND']) or -5
     conf['ub'] = 'UPPER_BOUND' in os.environ and int(os.environ['UPPER_BOUND']) or 5
-    conf['NGEN'] = 'NGEN' in os.environ and int(os.environ['NGEN']) or  10
+    conf['NGEN'] = 'NGEN' in os.environ and int(os.environ['NGEN']) or  20
     conf['experiment_id'] = 3
 
     worker = GWO_Worker(conf)
