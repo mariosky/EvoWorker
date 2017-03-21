@@ -152,15 +152,12 @@ if __name__ == "__main__":
     worker.setup()
 
     #worker.initialize(1120)
-    # for i  in range(conf['max_samples']):
-    #     print i ,
-    #     pop = worker.get()
-    #     finished, evals,  pop,  best_ind = worker.run(pop)
-    #     print worker.function.getfopt(),  best_ind.fitness.values[0],  '%+10.9e'% (best_ind.fitness.values[0] - worker.function.getfopt() + 1e-8)
-    #     for e in evals:
-    #         pass
-    #         #print e
-    #     worker.put_back(pop)
-    #     if finished:
-    #         break
+    for i  in range(conf['max_samples']):
+        print i ,
+        pop = worker.get()
+        finished, evals,  pop,  best_ind = worker.run(pop)
+        print worker.function.getfopt(),  best_ind.fitness.values[0],  '%+10.9e'% (best_ind.fitness.values[0] - worker.function.getfopt() + 1e-8)
+        worker.put_back(pop)
+        if finished:
+            break
 
