@@ -46,7 +46,6 @@ def start(cont):
 
 
 
-
 def kill_all():
     for container in get_containers('evo_worker'):
         print "Killing: ", container
@@ -75,10 +74,10 @@ if __name__ == "__main__":
     env = {}
     env['FUNCTION'] = 3
     env['INSTANCE'] =  1
-    env['dim'] = 'DIM' in os.environ and os.environ['DIM'] or  5
-    env['sample_size'] = 'SAMPLE_SIZE' in os.environ and os.environ['SAMPLE_SIZE'] or 300
+    env['DIM'] = 'DIM' in os.environ and os.environ['DIM'] or  5
+    env['SAMPLE_SIZE'] = 'SAMPLE_SIZE' in os.environ and os.environ['SAMPLE_SIZE'] or 300
     env['FEmax'] = 500000
-    env['EVOSPACE_URL'] = '127.0.0.1:3000/evospace'
+    env['EVOSPACE_URL'] = '192.168.1.100:3000/evospace'
     env['POP_NAME'] = 'test_pop'
     env['MAX_SAMPLES'] =  22
     env['BENCHMARK'] = True
@@ -86,6 +85,16 @@ if __name__ == "__main__":
 
     c = make_container(env)
     c.start()
+    while True:
+        time.sleep(3)
+        if( dC.containers.list(filters={'label':'evo_worker'})):
+            print "Working"
+        else:
+            print "Bye"
+            print c.logs()
+            break
+
+
     # for a in ALGORITHMS:
     #
     #     print create_worker({'LANG':cola.app_name, 'REDIS_HOST':os.environ['REDIS_HOST'], 'REDIS_PORT':os.environ['REDIS_PORT']})
