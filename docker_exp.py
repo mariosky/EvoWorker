@@ -38,8 +38,7 @@ class ImageException(Exception):
 
 
 def make_container(env, command = "python /home/EvoWorker/ga_worker.py %s " ):
-    return dC.create_container( BASE_IMAGE, environment=env ,command=command,  labels={'worker':env['LANG'] } ,
-                                ports={os.environ['REDIS_PORT']: {}})
+    return dC.containers.create(BASE_IMAGE, environment=env ,command=command,  labels={'evo_worker':'ga' })
 
 
 def start(cont):
@@ -73,8 +72,20 @@ if __name__ == "__main__":
 
     remove_all()
 
-    env 
+    env = {}
+    env['FUNCTION'] = 3
+    env['INSTANCE'] =  1
+    env['dim'] = 'DIM' in os.environ and os.environ['DIM'] or  5
+    env['sample_size'] = 'SAMPLE_SIZE' in os.environ and os.environ['SAMPLE_SIZE'] or 300
+    env['FEmax'] = 500000
+    env['EVOSPACE_URL'] = '127.0.0.1:3000/evospace'
+    env['POP_NAME'] = 'test_pop'
+    env['MAX_SAMPLES'] =  22
+    env['BENCHMARK'] = True
+    env['EXPERIMENT_ID'] = 12
 
+    c = make_container(env)
+    c.start()
     # for a in ALGORITHMS:
     #
     #     print create_worker({'LANG':cola.app_name, 'REDIS_HOST':os.environ['REDIS_HOST'], 'REDIS_PORT':os.environ['REDIS_PORT']})

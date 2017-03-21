@@ -11,7 +11,7 @@ from evospace import EvoSpace
 class GA_Worker:
     def __init__(self, conf):
         self.conf = conf
-        self.function = bn.dictbbob[self.conf['function']](self.conf['instance'])
+        self.function = bn.dictbbob[self.conf['function']](int(self.conf['instance']))
         self.F_opt = self.function.getfopt()
         self.function_evaluations = 0 #Is not needed in EvoWorkers, they dont know the number of FE
         self.maximum_function_evaluations = self.conf['FEmax'] #Is not needed in EvoWorkers, they dont know the number of FE
@@ -136,10 +136,10 @@ class GA_Worker:
 if __name__ == "__main__":
 
     conf = {}
-    conf['function'] = 'FUNCTION' in os.environ and os.environ['FUNCTION'] or  3
-    conf['instance'] = 'INSTANCE' in os.environ and os.environ['INSTANCE'] or  1
-    conf['dim'] = 'DIM' in os.environ and os.environ['DIM'] or  5
-    conf['sample_size'] = 'SAMPLE_SIZE' in os.environ and os.environ['SAMPLE_SIZE'] or 300
+    conf['function'] = 'FUNCTION' in os.environ and (os.environ['FUNCTION']) or  3
+    conf['instance'] = 'INSTANCE' in os.environ and int(os.environ['INSTANCE']) or  1
+    conf['dim'] = 'DIM' in os.environ and int(os.environ['DIM']) or  5
+    conf['sample_size'] = 'SAMPLE_SIZE' in os.environ and int(os.environ['SAMPLE_SIZE']) or 300
     conf['FEmax'] = 500000
     conf['evospace_url'] = 'EVOSPACE_URL' in os.environ and os.environ['EVOSPACE_URL'] or '127.0.0.1:3000/evospace'
     conf['pop_name'] = 'POP_NAME' in os.environ and os.environ['POP_NAME'] or 'test_pop'
