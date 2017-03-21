@@ -74,16 +74,20 @@ if __name__ == "__main__":
     env = {}
     env['FUNCTION'] = 3
     env['INSTANCE'] =  1
-    env['DIM'] = 'DIM' in os.environ and os.environ['DIM'] or  5
-    env['SAMPLE_SIZE'] = 'SAMPLE_SIZE' in os.environ and os.environ['SAMPLE_SIZE'] or 300
+    env['DIM'] =  5
+    env['SAMPLE_SIZE'] = 5
     env['FEmax'] = 500000
     env['EVOSPACE_URL'] = '192.168.1.100:3000/evospace'
     env['POP_NAME'] = 'test_pop'
     env['MAX_SAMPLES'] =  22
     env['BENCHMARK'] = True
     env['EXPERIMENT_ID'] = 12
+    env['LOWER_BOUND'] =  -5
+    env['UPPER_BOUND'] =  5
+    env['NGEN'] =   20
 
-    c = make_container(env)
+    c = make_container(env,command = "python /home/EvoWorker/pso_worker.py %s ")
+
     c.start()
     while True:
         time.sleep(3)
