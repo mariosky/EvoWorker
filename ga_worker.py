@@ -13,8 +13,8 @@ class GA_Worker:
         self.conf = conf
         self.function = bn.dictbbob[self.conf['function']](self.conf['instance'])
         self.F_opt = self.function.getfopt()
-        self.function_evaluations = 0
-        self.maximum_function_evaluations = self.conf['FEmax']
+        self.function_evaluations = 0 #Is not needed in EvoWorkers, they dont know the number of FE
+        self.maximum_function_evaluations = self.conf['FEmax'] #Is not needed in EvoWorkers, they dont know the number of FE
         self.deltaftarget = 1e-8
         self.toolbox = base.Toolbox()
         self.FC = 0
@@ -136,22 +136,22 @@ class GA_Worker:
 if __name__ == "__main__":
 
     conf = {}
-    conf['function'] = 3
-    conf['instance'] = 1
-    conf['dim'] = 5
-    conf['sample_size'] = 300
+    conf['function'] = 'FUNCTION' in os.environ and os.environ['FUNCTION'] or  3
+    conf['instance'] = 'INSTANCE' in os.environ and os.environ['INSTANCE'] or  1
+    conf['dim'] = 'DIM' in os.environ and os.environ['DIM'] or  5
+    conf['sample_size'] = 'SAMPLE_SIZE' in os.environ and os.environ['SAMPLE_SIZE'] or 300
     conf['FEmax'] = 500000
     conf['evospace_url'] = 'EVOSPACE_URL' in os.environ and os.environ['EVOSPACE_URL'] or '127.0.0.1:3000/evospace'
     conf['pop_name'] = 'POP_NAME' in os.environ and os.environ['POP_NAME'] or 'test_pop'
     conf['max_samples'] = 'MAX_SAMPLES' in os.environ and int(os.environ['MAX_SAMPLES']) or 22
     conf['benchmark'] = 'BENCHMARK' in os.environ
     conf['experiment_id'] = 'EXPERIMENT_ID' in os.environ and int(os.environ['EXPERIMENT_ID']) or str(uuid.uuid1())
-    conf['experiment_id'] = 1
 
     worker = GA_Worker(conf)
 
     worker.setup()
-    worker.initialize(1120)
+
+    #worker.initialize(1120)
     # for i  in range(conf['max_samples']):
     #     print i ,
     #     pop = worker.get()
