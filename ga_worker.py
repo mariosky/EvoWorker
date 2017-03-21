@@ -136,7 +136,7 @@ class GA_Worker:
 if __name__ == "__main__":
 
     conf = {}
-    conf['function'] = 'FUNCTION' in os.environ and (os.environ['FUNCTION']) or  3
+    conf['function'] = 'FUNCTION' in os.environ and int(os.environ['FUNCTION']) or  3
     conf['instance'] = 'INSTANCE' in os.environ and int(os.environ['INSTANCE']) or  1
     conf['dim'] = 'DIM' in os.environ and int(os.environ['DIM']) or  5
     conf['sample_size'] = 'SAMPLE_SIZE' in os.environ and int(os.environ['SAMPLE_SIZE']) or 300
