@@ -157,7 +157,7 @@ if __name__ == "__main__":
         print i ,
         pop = worker.get()
         finished, evals,  pop,  best_ind = worker.run(pop)
-        print worker.function.getfopt(),  best_ind.fitness.values[0],  '%+10.9e'% (best_ind.fitness.values[0] - worker.function.getfopt() + 1e-8)
+        print conf['function'],conf['instance'],  worker.function.getfopt(),  best_ind.fitness.values[0],  '%+10.9e'% (best_ind.fitness.values[0] - worker.function.getfopt() + 1e-8)
         worker.put_back(pop)
         if finished:
             break

@@ -79,7 +79,7 @@ def initialize( evospace_url, pop_name, dim, lb, hb, n ):
 
 if __name__ == "__main__":
 
-    initialize('192.168.1.100:3000/evospace','test_pop',5,-5,5,900)
+    initialize('192.168.1.100:3000/evospace','test_pop',5,-5,5,200)
     print get_containers()
     print  kill_all()
 
@@ -116,8 +116,8 @@ if __name__ == "__main__":
     #pso = make_container(pso_env, "python /home/EvoWorker/pso_worker.py %s ")
     #containers = [ga, pso]
 
-    gas =  [make_container(ga_env, "python /home/EvoWorker/ga_worker.py %s ") for _ in range(3) ]
-    psos = [make_container(ga_env, "python /home/EvoWorker/pso_worker.py %s ") for _ in range(3)]
+    gas =  [make_container(ga_env, "python /home/EvoWorker/ga_worker.py %s ") for _ in range(2) ]
+    psos = [make_container(ga_env, "python /home/EvoWorker/pso_worker.py %s ") for _ in range(2)]
     containers = gas+psos
 
 
