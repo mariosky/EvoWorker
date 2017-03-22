@@ -16,19 +16,15 @@ else:
 
 
 
-experiment = 'log:test_pop:55'
+experiment = 'log:test_pop:60'
 
 print r.llen(experiment)
-#data = [ast.literal_eval(i) for i in r.lrange(experiment, 0, -1)]
+data = [ast.literal_eval(i) for i in r.lrange(experiment, 0, -1)]
+data.reverse()
 
-for r in r.lrange(experiment, 0, -1):
-    print r
-    print ast.literal_eval(r)
 index = 0
 total = 0
 for r in data:
-    print r
     for e in r['evals']:
-        print r['algorithm'], total, index, e[1],r['fopt'], '%+10.9e'% ( e[1]-r['fopt'])
-        index+=1
-        total+=r['params']['sample_size']
+        print r['algorithm'], e[0],r['params']['sample_size'], index, e[1],r['fopt'], '%+10.9e'% ( e[1]-r['fopt']),e[2]
+
