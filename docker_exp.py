@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
     env = { 'FUNCTION': 3, 'INSTANCE':1, 'DIM':5,'FEmax':500000,
                'EVOSPACE_URL': '192.168.1.100:3000/evospace','POP_NAME':  'test_pop',
-               'UPPER_BOUND': 5, 'LOWER_BOUND': -5,  'BENCHMARK': True, 'EXPERIMENT_ID': 50,
+               'UPPER_BOUND': 5, 'LOWER_BOUND': -5,  'BENCHMARK': True, 'EXPERIMENT_ID': 55,
 
                'NGEN': 50, 'SAMPLE_SIZE':100, 'MAX_SAMPLES':10,'BENCHMARK':True}
 

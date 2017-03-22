@@ -16,11 +16,14 @@ else:
 
 
 
-experiment = 'log:test_pop:50'
+experiment = 'log:test_pop:55'
 
 print r.llen(experiment)
-data = [ast.literal_eval(i) for i in r.lrange(experiment, 0, -1)]
+#data = [ast.literal_eval(i) for i in r.lrange(experiment, 0, -1)]
 
+for r in r.lrange(experiment, 0, -1):
+    print r
+    print ast.literal_eval(r)
 index = 0
 total = 0
 for r in data:

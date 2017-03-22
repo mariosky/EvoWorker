@@ -22,6 +22,7 @@ class PSO_Worker(Worker):
 
         self.evospace_sample['sample'] = final_pop
 
+
         if 'benchmark' in self.conf:
             experiment_id = 'experiment_id' in conf and conf['experiment_id'] or 0
             self.evospace_sample['benchmark_data'] = {'params': self.params, 'evals': s.convergence, 'algorithm': 'PSO',
@@ -36,6 +37,10 @@ class PSO_Worker(Worker):
 
     def run(self, pop):
         self.function.__name__ = "F%s instance %s" % (self.conf['function'], self.conf['instance'])
+        self.params = {'NGEN': self.conf['NGEN'], 'sample_size': self.conf['sample_size'],
+                       'init': 'random:[-5,5]'
+                       }
+
         return pso.PSO(objf=self.function, lb=conf['lb'], ub=conf['ub'], dim=self.conf['dim'], PopSize=conf['sample_size'], iters=conf['NGEN'], pos=pop, fopt=self.function.getfopt())
 
 
