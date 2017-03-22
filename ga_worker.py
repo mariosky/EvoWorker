@@ -70,7 +70,7 @@ class GA_Worker:
         evals = []
 
         #random.seed(i)
-        CXPB, MUTPB, NGEN = random.uniform(.8,1), random.uniform(.1,.6), random.randint(50,100)
+        CXPB, MUTPB, NGEN = random.uniform(.8,1), random.uniform(.1,.6), conf['NGEN']
 
         # Evaluate the entire population
         fitnesses = list(map(self.toolbox.evaluate, pop))
@@ -145,19 +145,20 @@ if __name__ == "__main__":
     conf['pop_name'] = 'POP_NAME' in os.environ and os.environ['POP_NAME'] or 'test_pop'
     conf['max_samples'] = 'MAX_SAMPLES' in os.environ and int(os.environ['MAX_SAMPLES']) or 22
     conf['benchmark'] = 'BENCHMARK' in os.environ
+    conf['NGEN'] = 'NGEN' in os.environ and int(os.environ['NGEN']) or 20
     conf['experiment_id'] = 'EXPERIMENT_ID' in os.environ and int(os.environ['EXPERIMENT_ID']) or str(uuid.uuid1())
 
     worker = GA_Worker(conf)
 
     worker.setup()
 
-    worker.initialize(200)
-    # for i  in range(conf['max_samples']):
-    #     print i ,
-    #     pop = worker.get()
-    #     finished, evals,  pop,  best_ind = worker.run(pop)
-    #     print worker.function.getfopt(),  best_ind.fitness.values[0],  '%+10.9e'% (best_ind.fitness.values[0] - worker.function.getfopt() + 1e-8)
-    #     worker.put_back(pop)
-    #     if finished:
-    #         break
+    #worker.initialize(200)
+    for i  in range(conf['max_samples']):
+        print i ,
+        pop = worker.get()
+        finished, evals,  pop,  best_ind = worker.run(pop)
+        print worker.function.getfopt(),  best_ind.fitness.values[0],  '%+10.9e'% (best_ind.fitness.values[0] - worker.function.getfopt() + 1e-8)
+        worker.put_back(pop)
+        if finished:
+            break
 
