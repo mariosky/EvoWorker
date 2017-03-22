@@ -41,9 +41,9 @@ class GWO_Worker(Worker):
 
 if __name__ == "__main__":
     conf = {}
-    conf['function'] = 3
-    conf['instance'] = 1
-    conf['dim'] = 5
+    conf['function'] = 'FUNCTION' in os.environ and int(os.environ['FUNCTION']) or  3
+    conf['instance'] = 'INSTANCE' in os.environ and int(os.environ['INSTANCE']) or  1
+    conf['dim'] = 'DIM' in os.environ and int(os.environ['DIM']) or  5
     conf['sample_size'] = 100
     conf['FEmax'] = 500000
     conf['evospace_url'] = 'EVOSPACE_URL' in os.environ and os.environ['EVOSPACE_URL'] or '127.0.0.1:3000/evospace'
