@@ -61,7 +61,6 @@ if __name__ == "__main__":
     print "Ready"
     for i  in range(conf['max_samples']):
         pop = worker.get()
-        #print pop ,
         s = worker.run(pop)
         print s.best, '%+10.9e' % (s.best - worker.function.getfopt() + 1e-8)
         worker.put_back(s)

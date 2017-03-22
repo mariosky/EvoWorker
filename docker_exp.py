@@ -71,31 +71,50 @@ if __name__ == "__main__":
 
     remove_all()
 
-    env = {}
-    env['FUNCTION'] = 3
-    env['INSTANCE'] =  1
-    env['DIM'] =  5
-    env['SAMPLE_SIZE'] = 5
-    env['FEmax'] = 500000
-    env['EVOSPACE_URL'] = '192.168.1.100:3000/evospace'
-    env['POP_NAME'] = 'test_pop'
-    env['MAX_SAMPLES'] =  22
-    env['BENCHMARK'] = True
-    env['EXPERIMENT_ID'] = 12
-    env['LOWER_BOUND'] =  -5
-    env['UPPER_BOUND'] =  5
-    env['NGEN'] =   20
 
-    c = make_container(env,command = "python /home/EvoWorker/pso_worker.py %s ")
+    ga_env = { 'FUNCTION': 3, 'INSTANCE':1, 'DIM':5,'FEmax':500000,
+               'EVOSPACE_URL': '192.168.1.34:3000/evospace','POP_NAME':  'test_pop',
+               'UPPER_BOUND': 5, 'LOWER_BOUND': -5,  'BENCHMARK': True, 'EXPERIMENT_ID': 12,
 
-    c.start()
+               'SAMPLE_SIZE':50, 'MAX_SAMPLES':10,'BENCHMARK':True}
+
+    gwo_env = {'FUNCTION': 3, 'INSTANCE': 1, 'DIM': 5, 'FEmax': 500000,
+               'EVOSPACE_URL': '192.168.1.34:3000/evospace', 'POP_NAME': 'test_pop',
+               'UPPER_BOUND': 5, 'LOWER_BOUND': -5,  'BENCHMARK': True, 'EXPERIMENT_ID': 12,
+
+               'SAMPLE_SIZE': 100, 'MAX_SAMPLES': 22,  'NGEN': 10}
+
+    pso_env = {'FUNCTION': 3, 'INSTANCE': 1, 'DIM': 5, 'FEmax': 500000,
+               'EVOSPACE_URL': '192.168.1.34:3000/evospace', 'POP_NAME': 'test_pop',
+               'UPPER_BOUND': 5, 'LOWER_BOUND': -5, 'BENCHMARK': True, 'EXPERIMENT_ID': 12,
+
+               'SAMPLE_SIZE': 10, 'MAX_SAMPLES': 100, 'NGEN': 10}
+
+    algs = [ (gwo_env,"python /home/EvoWorker/gwo_worker.py %s "),
+             (ga_env, "python /home/EvoWorker/ga_worker.py %s "),
+             (pso_env, "python /home/EvoWorker/pso_worker.py %s "),
+            ]
+
+    #gwo = make_container(gwo_env,"python /home/EvoWorker/gwo_worker.py %s ")
+    ga =  make_container(ga_env, "python /home/EvoWorker/ga_worker.py %s ")
+    pso = make_container(pso_env, "python /home/EvoWorker/pso_worker.py %s ")
+
+    containers = [ga,pso]
+    time.sleep(10)
+    for c in containers:
+        "start",c
+        c.start()
+
+
     while True:
         time.sleep(3)
         if( dC.containers.list(filters={'label':'evo_worker'})):
             print "Working"
         else:
             print "Bye"
-            print c.logs()
+            #print gwo.logs()
+            print ga.logs()
+            print pso.logs()
             break
 
 
