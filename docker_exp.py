@@ -67,19 +67,20 @@ def get_containers(label='evo_worker', all=False):
     return dC.containers.list(all=all, filters={'label': label})
 
 
-def initialize( evospace_url, pop_name, dim, lb, hb, n ):
+def initialize( evospace_url, pop_name, dim, lb, ub, n ):
     space = EvoSpace(evospace_url, pop_name)
     space.delete()
     space.initialize()
-    init_pop = [{"chromosome": [random.uniform(lb,hb) for _ in range(dim)], "id": None, "fitness": {"DefaultContext": 0.0}} for _ in range(n)]
+    init_pop = [{"chromosome": [random.uniform(lb,ub) for _ in range(dim)], "id": None, "fitness": {"DefaultContext": 0.0}} for _ in range(n)]
     space.post_subpop(init_pop)
 
 
 
 
 if __name__ == "__main__":
-
-    initialize('192.168.1.100:3000/evospace','test_pop',5,-5,5,200)
+    print "clearing space"
+    initialize('192.168.1.100:3000/evospace','test_pop',5,-5,5,1000)
+    time.sleep(20)
     print get_containers()
     print  kill_all()
 
@@ -88,37 +89,39 @@ if __name__ == "__main__":
 
 
 
-    ga_env = { 'FUNCTION': 5, 'INSTANCE':1, 'DIM':5,'FEmax':500000,
+    env = { 'FUNCTION': 3, 'INSTANCE':1, 'DIM':5,'FEmax':500000,
                'EVOSPACE_URL': '192.168.1.100:3000/evospace','POP_NAME':  'test_pop',
-               'UPPER_BOUND': 5, 'LOWER_BOUND': -5,  'BENCHMARK': True, 'EXPERIMENT_ID': 12,
+               'UPPER_BOUND': 5, 'LOWER_BOUND': -5,  'BENCHMARK': True, 'EXPERIMENT_ID': 50,
 
-               'NGEN': 10, 'SAMPLE_SIZE':50, 'MAX_SAMPLES':10,'BENCHMARK':True}
+               'NGEN': 50, 'SAMPLE_SIZE':100, 'MAX_SAMPLES':10,'BENCHMARK':True}
 
-    gwo_env = {'FUNCTION': 5, 'INSTANCE': 1, 'DIM': 5, 'FEmax': 500000,
-               'EVOSPACE_URL': '192.168.1.100:3000/evospace', 'POP_NAME': 'test_pop',
-               'UPPER_BOUND': 5, 'LOWER_BOUND': -5,  'BENCHMARK': True, 'EXPERIMENT_ID': 12,
+    #gwo_env = {'FUNCTION': 3, 'INSTANCE': 1, 'DIM': 5, 'FEmax': 500000,
+    #           'EVOSPACE_URL': '192.168.1.100:3000/evospace', 'POP_NAME': 'test_pop',
+    #           'UPPER_BOUND': 5, 'LOWER_BOUND': -5,  'BENCHMARK': True, 'EXPERIMENT_ID': 12,
 
-               'SAMPLE_SIZE': 100, 'MAX_SAMPLES': 22,  'NGEN': 10}
+    #          'SAMPLE_SIZE': 100, 'MAX_SAMPLES': 22,  'NGEN': 10}
 
-    pso_env = {'FUNCTION': 5, 'INSTANCE': 1, 'DIM': 5, 'FEmax': 500000,
-               'EVOSPACE_URL': '192.168.1.100:3000/evospace', 'POP_NAME': 'test_pop',
-               'UPPER_BOUND': 5, 'LOWER_BOUND': -5, 'BENCHMARK': True, 'EXPERIMENT_ID': 12,
+    #pso_env = {'FUNCTION': 3, 'INSTANCE': 1, 'DIM': 5, 'FEmax': 500000,
+    #           'EVOSPACE_URL': '192.168.1.100:3000/evospace', 'POP_NAME': 'test_pop',
+    #           'UPPER_BOUND': 5, 'LOWER_BOUND': -5, 'BENCHMARK': True, 'EXPERIMENT_ID': 12,
+#
+ #              'SAMPLE_SIZE': 100, 'MAX_SAMPLES': 40, 'NGEN': 50}
 
-               'SAMPLE_SIZE': 10, 'MAX_SAMPLES': 40, 'NGEN': 10}
-
-    algs = [ (gwo_env,"python /home/EvoWorker/gwo_worker.py %s "),
-             (ga_env, "python /home/EvoWorker/ga_worker.py %s "),
-             (pso_env, "python /home/EvoWorker/pso_worker.py %s "),
-            ]
+  #  algs = [ (gwo_env,"python /home/EvoWorker/gwo_worker.py %s "),
+   #          (ga_env, "python /home/EvoWorker/ga_worker.py %s "),
+    #         (pso_env, "python /home/EvoWorker/pso_worker.py %s "),
+     #       ]
 
     #gwo = make_container(gwo_env,"python /home/EvoWorker/gwo_worker.py %s ")
     #ga =  make_container(ga_env, "python /home/EvoWorker/ga_worker.py %s ")
     #pso = make_container(pso_env, "python /home/EvoWorker/pso_worker.py %s ")
     #containers = [ga, pso]
 
-    gas =  [make_container(ga_env, "python /home/EvoWorker/ga_worker.py %s ") for _ in range(2) ]
-    psos = [make_container(ga_env, "python /home/EvoWorker/pso_worker.py %s ") for _ in range(2)]
-    containers = gas+psos
+    gas =  [make_container(env, "python /home/EvoWorker/ga_worker.py %s ") for _ in range(2) ]
+    psos = [make_container(env, "python /home/EvoWorker/pso_worker.py %s ") for _ in range(2)]
+    containers = psos+gas
+    #containers = gas+psos
+
 
 
 

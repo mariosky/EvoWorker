@@ -14,15 +14,18 @@ else:
     r = redis.Redis(host=HOST, port=PORT)
 
 
-experiment = 'log:test_pop:4'
+
+
+experiment = 'log:test_pop:50'
 
 print r.llen(experiment)
-data = [ast.literal_eval(i) for i in r.lrange(experiment, 0, 22)]
+data = [ast.literal_eval(i) for i in r.lrange(experiment, 0, -1)]
 
 index = 0
 total = 0
 for r in data:
-    for e in r['Fevals']:
-        print total, index, e[1],r['fopt'], '%+10.9e'% ( e[1]-r['fopt'])
+    print r
+    for e in r['evals']:
+        print r['algorithm'], total, index, e[1],r['fopt'], '%+10.9e'% ( e[1]-r['fopt'])
         index+=1
-        total+=30
+        total+=r['params']['sample_size']

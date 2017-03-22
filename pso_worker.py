@@ -5,7 +5,7 @@ import numpy as np
 from EvoloPy import PSO as pso
 from worker import  Worker
 
-class GWO_Worker(Worker):
+class PSO_Worker(Worker):
     def setup(self):
         pass
         #evospace_sample = self.space.get_sample(self.conf['sample_size'])
@@ -24,7 +24,7 @@ class GWO_Worker(Worker):
 
         if 'benchmark' in self.conf:
             experiment_id = 'experiment_id' in conf and conf['experiment_id'] or 0
-            self.evospace_sample['benchmark_data'] = {'params': self.params, 'evals': s.convergence, 'algorithm': 'GWO',
+            self.evospace_sample['benchmark_data'] = {'params': self.params, 'evals': s.convergence, 'algorithm': 'PSO',
                                                       'benchmark': self.conf['function'],
                                                       'instance': self.conf['instance'],
                                                       'worker_id': str(self.worker_uuid),
@@ -54,9 +54,9 @@ if __name__ == "__main__":
     conf['lb'] = 'LOWER_BOUND' in os.environ and int(os.environ['LOWER_BOUND']) or -5
     conf['ub'] = 'UPPER_BOUND' in os.environ and int(os.environ['UPPER_BOUND']) or 5
     conf['NGEN'] = 'NGEN' in os.environ and int(os.environ['NGEN']) or  20
-    conf['experiment_id'] = 3
 
-    worker = GWO_Worker(conf)
+
+    worker = PSO_Worker(conf)
 
     print "Ready"
     for i  in range(conf['max_samples']):
