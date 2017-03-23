@@ -15,7 +15,7 @@ class CoCoData(object):
         self.nbFirstEvalsToAlwaysWrite = 1
 
 
-    def evalfun(self, x, algorithm, gen, ngen, fmin, fopt, error, sol,y, result=None ):
+    def evalfun(self, algorithm, gen, ngen, fmin, fopt, error, sol, result=None ):
         fmin = float(fmin)
         fopt = float(fopt)
 
@@ -25,7 +25,7 @@ class CoCoData(object):
             #We must write if we are past the trigger?
 
             if self.lasteval_num >= self.evalsTrigger:
-                result.append((self.lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol,y))
+                result.append((self.lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol))
 
                 while self.lasteval_num >= np.floor(10 ** (self.idxEvalsTrigger / self.nbptsevals)):
                     self.idxEvalsTrigger += 1
@@ -38,7 +38,7 @@ class CoCoData(object):
 
             # Also if we have a better solution
             if fmin - fopt < self.fTrigger:  # minimization only
-                result.append((self.lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol, y,'A'))
+                result.append((self.lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol,'A'))
                 if fmin <= fopt:
                     self.fTrigger = -np.inf
                 else:

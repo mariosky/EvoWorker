@@ -63,6 +63,7 @@ class GA_Worker:
             self.evospace_sample['benchmark_data'] = {'params': self.params, 'evals': evals, 'algorithm': 'GA',
                                                  'benchmark': self.conf['function'], 'instance': self.conf['instance'],
                                                  'worker_id': str(self.worker_uuid), 'experiment_id': experiment_id,
+                                                 'dim':self.conf['dim'],
                                                  'fopt': self.function.getfopt()}
         self.space.put_sample(self.evospace_sample)
 
