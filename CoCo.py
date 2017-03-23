@@ -15,7 +15,7 @@ class CoCoData(object):
         self.nbFirstEvalsToAlwaysWrite = 1
 
 
-    def evalfun(self, algorithm, gen, ngen, fmin, fopt, error, sol, result=None ):
+    def evalfun(self, algorithm, gen, ngen, fmin, fopt, error, sol,buffr=None,hbuffr=None):
         fmin = float(fmin)
         fopt = float(fopt)
 
@@ -25,7 +25,7 @@ class CoCoData(object):
             #We must write if we are past the trigger?
 
             if self.lasteval_num >= self.evalsTrigger:
-                result.append((self.lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol))
+                buffr.append(self.sprintData(self.lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol))
 
                 while self.lasteval_num >= np.floor(10 ** (self.idxEvalsTrigger / self.nbptsevals)):
                     self.idxEvalsTrigger += 1
@@ -38,7 +38,7 @@ class CoCoData(object):
 
             # Also if we have a better solution
             if fmin - fopt < self.fTrigger:  # minimization only
-                result.append((self.lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol,'A'))
+                hbuffr.append(self.sprintData(self.lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol))
                 if fmin <= fopt:
                     self.fTrigger = -np.inf
                 else:
@@ -49,3 +49,19 @@ class CoCoData(object):
                     self.fTrigger = min(self.fTrigger, 10 ** (self.idxFTrigger / self.nbptsf))  # TODO: why?
 
         self.lasteval_num=self.lasteval_num+int(ngen)
+
+    def sprintData(self, lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol):
+        """Format data for printing."""
+
+        res = ('%d %+10.9e %+10.9e %+10.9e %+10.9e'
+               % (lasteval_num, fmin - fopt,
+                  fmin - fopt, fmin,
+                  fopt))
+
+        if len(sol) < 22:
+            tmp = []
+            for i in sol:
+                tmp.append(' %+5.4e' % i)
+            res += ''.join(tmp)
+        res += '\n'
+        return res

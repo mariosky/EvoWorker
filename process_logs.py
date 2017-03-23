@@ -17,7 +17,7 @@ else:
     r = redis.Redis(host=HOST, port=PORT)
 
 
-EXPERIMENT_ID = 80
+EXPERIMENT_ID = 101
 DATA_FOLDER = './experiment_data/' + str(EXPERIMENT_ID) + '/'
 experiment = 'log:test_pop:' + str(EXPERIMENT_ID)
 
@@ -33,17 +33,32 @@ with open(DATA_FOLDER+experiment+'.json', 'w') as f:
     json.dump(data, f)
 
 
-grp_benchmark = itemgetter("benchmark")
+grp_benchmark = itemgetter("benchmark","dim")
 grp_instance = itemgetter("benchmark","instance")
 result = []
 for key, benchmark_group in groupby(data, grp_benchmark):
-    print key
+    #Create folder if not exisits
+    folder = DATA_FOLDER + '/F' + str(key[0])
+    try:
+        os.makedirs(folder)
+    except OSError:
+        pass
+
+    # Create files
+    filename = '%s-%02d_f%s_DIM%d' % (str(EXPERIMENT_ID), 0,
+                                      str(key[0]), key[1])
+    datafile =  folder+'/' + filename + '.tdat'
+    hdatafile = folder+'/' + filename + '.dat'
+
+    print "F" + str(key[0]) + " Dimension:" + str(key[1])
     for key,benchmark in groupby(benchmark_group, grp_instance):
-        print key
+        print  " Instance:" + str(key[1])
         coco = CoCoData(5)
         index = 0
         total = 0
-        result = []
+        buffr = []
+        hbuffr =[]
+
         for row in benchmark:
             data_row = []
             row_id=0
@@ -52,6 +67,27 @@ for key, benchmark_group in groupby(data, grp_benchmark):
                 row_id+=1
             data_row.sort(reverse=True)
             for r in data_row:
-                coco.evalfun(*r[1:],result=result)
-        print result
+                coco.evalfun(*r[1:],buffr=buffr,hbuffr=hbuffr)
+
+        if buffr:
+            f = open(datafile, 'a')
+            f.write('%% function evaluation | noise-free fitness - Fopt'
+                    ' () | best noise-free fitness - Fopt | measured '
+                    'fitness | best measured fitness | x1 | x2...\n'
+                    )
+
+            f.writelines(buffr)
+
+            f.close()
+        if hbuffr:
+            f = open(hdatafile, 'a')
+            f.write('%% function evaluation | noise-free fitness - Fopt'
+                    ' () | best noise-free fitness - Fopt | measured '
+                    'fitness | best measured fitness | x1 | x2...\n'
+                    )
+            f.writelines(hbuffr)
+            f.close()
+
+
+
 
