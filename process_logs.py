@@ -17,20 +17,25 @@ else:
 
 
 
-experiment = 'log:test_pop:60'
+experiment = 'log:test_pop:66'
 
 print r.llen(experiment)
 data = [ast.literal_eval(i) for i in r.lrange(experiment, 0, -1)]
+
 data.reverse()
+
 
 
 index = 0
 total = 0
 
 data_row = []
+row_id=0
 for r in data:
     for e in r['evals']:
-        data_row.append( (r['algorithm'], e[0],r['params']['sample_size'], e[1],r['fopt'], '%+10.9e'% ( e[1]-r['fopt']),e[2]))
+        data_row.append(  (e[1], r['algorithm'], e[0],r['params']['sample_size'], e[1],r['fopt'], '%+10.9e'% ( e[1]-r['fopt']),e[2],row_id))
+        row_id+=1
+data_row.sort(reverse=True)
 
 
 evalsTrigger = 1
@@ -45,7 +50,7 @@ idxDIMEvalsTrigger = 0.
 nbFirstEvalsToAlwaysWrite = 1
 
 
-def evalfun( algorithm, gen, ngen, fmin, fopt, error, sol ):
+def evalfun(x, algorithm, gen, ngen, fmin, fopt, error, sol,y ):
     global evalsTrigger
     global lasteval_num
     global fTrigger
@@ -66,7 +71,7 @@ def evalfun( algorithm, gen, ngen, fmin, fopt, error, sol ):
 
 
         if lasteval_num >= evalsTrigger:
-            print lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol
+            print lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol,y
 
             while lasteval_num >= np.floor(10 ** (idxEvalsTrigger / nbptsevals)):
                 idxEvalsTrigger += 1
@@ -79,7 +84,7 @@ def evalfun( algorithm, gen, ngen, fmin, fopt, error, sol ):
 
         # Also if we have a better solution
         if fmin - fopt < fTrigger:  # minimization only
-            print lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol,"A"
+            print lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol, y,"A"
             if fmin <= fopt:
                 fTrigger = -np.inf
             else:
