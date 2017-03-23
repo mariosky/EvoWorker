@@ -57,7 +57,12 @@ class EvoSpace(object):
         return r.json()['result']
 
 
-
+def initialize( evospace_url, pop_name, dim, lb, ub, n ):
+    space = EvoSpace(evospace_url, pop_name)
+    space.delete()
+    space.initialize()
+    init_pop = [{"chromosome": [random.uniform(lb,ub) for _ in range(dim)], "id": None, "fitness": {"DefaultContext": 0.0}} for _ in range(n)]
+    space.post_subpop(init_pop)
 
 
 
