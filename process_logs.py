@@ -45,7 +45,7 @@ idxDIMEvalsTrigger = 0.
 nbFirstEvalsToAlwaysWrite = 1
 
 
-def evalfun( algorithm, gen, ngen, fmin, fopt, ftrue, sol ):
+def evalfun( algorithm, gen, ngen, fmin, fopt, error, sol ):
     global evalsTrigger
     global lasteval_num
     global fTrigger
@@ -58,16 +58,15 @@ def evalfun( algorithm, gen, ngen, fmin, fopt, ftrue, sol ):
     fmin = float(fmin)
     fopt = float(fopt)
 
-    ftrue = float(ftrue)
+    error = float(error)
 
-    if (lasteval_num >= evalsTrigger or
-                    ftrue  - fopt < fTrigger):
+    if (lasteval_num >= evalsTrigger or fmin  - fopt < fTrigger):
         #We must write if we are past the trigger?
 
 
 
         if lasteval_num >= evalsTrigger:
-            print lasteval_num, algorithm, gen, ngen, fmin, fopt, ftrue, sol
+            print lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol
 
             while lasteval_num >= np.floor(10 ** (idxEvalsTrigger / nbptsevals)):
                 idxEvalsTrigger += 1
@@ -80,17 +79,17 @@ def evalfun( algorithm, gen, ngen, fmin, fopt, ftrue, sol ):
 
         # Also if we have a better solution
         if fmin - fopt < fTrigger:  # minimization only
-            print lasteval_num, algorithm, gen, ngen, fmin, fopt, ftrue, sol,"A"
-            if ftrue <= fopt:
+            print lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol,"A"
+            if fmin <= fopt:
                 fTrigger = -np.inf
             else:
                 if np.isinf(idxFTrigger):
-                   idxFTrigger = np.ceil(np.log10(ftrue - fopt)) * nbptsf
-                while ftrue - fopt <= 10 ** (idxFTrigger / nbptsf):
+                   idxFTrigger = np.ceil(np.log10(fmin - fopt)) * nbptsf
+                while fmin - fopt <= 10 ** (idxFTrigger / nbptsf):
                     idxFTrigger -= 1
                 fTrigger = min(fTrigger, 10 ** (idxFTrigger / nbptsf))  # TODO: why?
 
-    lasteval_num=lasteval_num+ int(ngen)
+    lasteval_num=lasteval_num+int(ngen)
 
 
 

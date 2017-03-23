@@ -79,7 +79,7 @@ def initialize( evospace_url, pop_name, dim, lb, ub, n ):
 
 if __name__ == "__main__":
     print "clearing space"
-    initialize('192.168.1.100:3000/evospace','test_pop',5,-5,5,1000)
+    initialize('192.168.1.13:3000/evospace','test_pop',5,-5,5,1000)
     time.sleep(20)
     print get_containers()
     print  kill_all()
@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
 
     env = { 'FUNCTION': 3, 'INSTANCE':1, 'DIM':5,'FEmax':500000,
-               'EVOSPACE_URL': '192.168.1.100:3000/evospace','POP_NAME':  'test_pop',
+               'EVOSPACE_URL': '192.168.1.13:3000/evospace','POP_NAME':  'test_pop',
                'UPPER_BOUND': 5, 'LOWER_BOUND': -5,  'BENCHMARK': True, 'EXPERIMENT_ID': 60,
 
                'NGEN': 50, 'SAMPLE_SIZE':100, 'MAX_SAMPLES':10,'BENCHMARK':True}
