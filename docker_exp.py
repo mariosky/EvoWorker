@@ -8,17 +8,20 @@ import json
 
 
 #Set IP of REDIS box. Redis Host is sent to workers so it can not be 127.0.0.1
-REDIS_HOST= 'REDIS_HOST' in os.environ and int(os.environ['REDIS_HOST']) or '192.168.1.100'
+REDIS_HOST= 'REDIS_HOST' in os.environ and int(os.environ['REDIS_HOST']) or '192.168.1.13'
 #Experiment ID must be an integer
-EXPERIMENT_ID = 102
+EXPERIMENT_ID = 106
 
 DATA_ROOT = './experiment_data'
 DATA_FOLDER = './experiment_data/' + str(EXPERIMENT_ID)
 
 
-for dim in (2, 3, 5, 10):
+for dim in (2,3):
+#for dim in (2, 3, 5, 10):
     print "DIM", dim
-    for instance in range(1,6)+range(41, 51):
+
+    #for instance in range(1,6)+range(41, 51):
+    for instance in range(1,3):
         print "instance", instance
         EVOSPACE_SIZE = 1000
         env = {'FUNCTION': 3, 'DIM': dim, 'INSTANCE': instance,  'FEmax': 500000,
@@ -43,8 +46,8 @@ for dim in (2, 3, 5, 10):
         with open(DATA_FOLDER+'/info_'+str(EXPERIMENT_ID)+'.json', 'w') as f:
             json.dump({'info':info}, f)
 
-        gas =  [dw.make_container(env, "python /home/EvoWorker/ga_worker.py %s ") for _ in range(2) ]
-        psos = [dw.make_container(env, "python /home/EvoWorker/pso_worker.py %s ") for _ in range(4)]
+        gas =  [dw.make_container(env, "python /home/EvoWorker/ga_worker.py %s ") for _ in range(1) ]
+        psos = [dw.make_container(env, "python /home/EvoWorker/pso_worker.py %s ") for _ in range(1)]
         containers = gas+psos
 
         for c in containers:
