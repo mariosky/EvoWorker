@@ -93,9 +93,9 @@ for dim_key, benchmark_group in groupby(data, grp_benchmark):
 
         if buffr:
             f = open(datafile, 'a')
-            f.write('% function evaluation | noise-free fitness - Fopt'
-                    ' () | best noise-free fitness - Fopt | measured '
-                    'fitness | best measured fitness | x1 | x2...\n'
+            f.write('%% function evaluation | noise-free fitness - Fopt'
+                    ' (%13.12e) | best noise-free fitness - Fopt | measured '
+                    'fitness | best measured fitness | x1 | x2...\n' % row['fopt']
                     )
 
 
@@ -104,9 +104,9 @@ for dim_key, benchmark_group in groupby(data, grp_benchmark):
             f.close()
         if hbuffr:
             f = open(hdatafile, 'a')
-            f.write('% function evaluation | noise-free fitness - Fopt'
-                    ' () | best noise-free fitness - Fopt | measured '
-                    'fitness | best measured fitness | x1 | x2...\n'
+            f.write('%% function evaluation | noise-free fitness - Fopt'
+                    ' (%13.12e) | best noise-free fitness - Fopt | measured '
+                    'fitness | best measured fitness | x1 | x2...\n' % row['fopt']
                     )
             f.writelines(hbuffr)
             f.close()
