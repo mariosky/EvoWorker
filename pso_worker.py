@@ -50,7 +50,7 @@ if __name__ == "__main__":
     conf['function'] = 'FUNCTION' in os.environ and int(os.environ['FUNCTION']) or  3
     conf['instance'] = 'INSTANCE' in os.environ and int(os.environ['INSTANCE']) or  1
     conf['dim'] = 'DIM' in os.environ and int(os.environ['DIM']) or  5
-    conf['sample_size'] = 100
+    conf['sample_size'] = 'SAMPLE_SIZE' in os.environ and int(os.environ['SAMPLE_SIZE']) or 100
     conf['FEmax'] = 500000
     conf['evospace_url'] = 'EVOSPACE_URL' in os.environ and os.environ['EVOSPACE_URL'] or '127.0.0.1:3000/evospace'
     conf['pop_name'] = 'POP_NAME' in os.environ and os.environ['POP_NAME'] or 'test_pop'

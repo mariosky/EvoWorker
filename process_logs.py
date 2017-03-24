@@ -17,7 +17,7 @@ else:
     r = redis.Redis(host=HOST, port=PORT)
 
 
-EXPERIMENT_ID = 106
+EXPERIMENT_ID = 107
 DATA_FOLDER = './experiment_data/' + str(EXPERIMENT_ID) + '/'
 experiment = 'log:test_pop:' + str(EXPERIMENT_ID)
 
@@ -37,32 +37,32 @@ grp_benchmark = itemgetter("benchmark","dim")
 grp_instance = itemgetter("benchmark","instance")
 result = []
 new_info = True
-for key, benchmark_group in groupby(data, grp_benchmark):
+for dim_key, benchmark_group in groupby(data, grp_benchmark):
     #Create folder if not exisits
-    folder = DATA_FOLDER + '/F' + str(key[0])
+    folder = DATA_FOLDER + '/F' + str(dim_key[0])
     try:
         os.makedirs(folder)
     except OSError:
         pass
 
-    indexfile = DATA_FOLDER + '%s.info' % ( '/F' + str(key[0]))
+    indexfile = DATA_FOLDER + '%s.info' % ( '/F' + str(dim_key[0]))
 
     # Create files
     filename = '%s-%02d_f%s_DIM%d' % (str(EXPERIMENT_ID), 0,
-                                      str(key[0]), key[1])
+                                      str(dim_key[0]), dim_key[1])
     datafile =  folder+'/' + filename + '.tdat'
     hdatafile = folder+'/' + filename + '.dat'
 
-    print "F" + str(key[0]) + " Dimension:" + str(key[1])
+    print "F" + str(dim_key[0]) + " Dimension:" + str(dim_key[1])
 
     comment = "% EvoSpace: Pool Based Algorithm see info in root folder"
     if new_info:
         info = """funcId = %s, DIM = %d, Precision = 1.000e-08, algId = 'EvoSpace'\n%s\nF%s/%s.dat, """ % \
-           (str(key[0]), key[1], comment, key[0],filename)
+           (str(dim_key[0]), dim_key[1], comment, dim_key[0],filename)
         new_info = False
     else:
         info = """\nfuncId = %s, DIM = %d, Precision = 1.000e-08, algId = 'EvoSpace'\n%s\nF%s/%s.dat, """ % \
-               (str(key[0]), key[1], comment, key[0], filename)
+               (str(dim_key[0]), dim_key[1], comment, dim_key[0], filename)
 
 
     f = open(indexfile, 'a')
@@ -71,11 +71,11 @@ for key, benchmark_group in groupby(data, grp_benchmark):
     f.close()
     new_instance = True
 
-    for key,benchmark in groupby(benchmark_group, grp_instance):
-        print  " Instance:" + str(key[1])
+    for instance_key,benchmark in groupby(benchmark_group, grp_instance):
+        print  " Instance:" + str(instance_key[1])
 
 
-        coco = CoCoData(5)
+        coco = CoCoData(dim_key[1])
         index = 0
         total = 0
         buffr = []
@@ -116,10 +116,10 @@ for key, benchmark_group in groupby(data, grp_benchmark):
 
         f = open(indexfile, 'a')
         if new_instance:
-            f.write('%s:%d|%.1e' % (key[1],int(last[0]), float(last[1])))
+            f.write('%s:%d|%.1e' % (instance_key[1],int(last[0]), float(last[1])))
             new_instance = False
         else:
-            f.write(', %s:%d|%.1e' % (key[1], int(last[0]), float(last[1])))
+            f.write(', %s:%d|%.1e' % (instance_key[1], int(last[0]), float(last[1])))
 
         f.close()
 
