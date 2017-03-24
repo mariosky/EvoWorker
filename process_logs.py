@@ -110,11 +110,8 @@ for dim_key, benchmark_group in groupby(data, grp_benchmark):
             f.writelines(hbuffr)
             f.close()
 
-        last_hbuffr = hbuffr[-1].split(" ")
-        last_buffr = buffr[-1].split(" ")
-        print last_buffr, last_hbuffr
-        last = max( last_buffr,  last_hbuffr )
-        print last
+
+        last = buffr[-1].split(" ")
 
 
 

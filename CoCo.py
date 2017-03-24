@@ -21,6 +21,8 @@ class CoCoData(object):
 
         error = float(error)
 
+        self.lasteval_num = self.lasteval_num + int(ngen)
+
         if (self.lasteval_num >= self.evalsTrigger or fmin  - fopt < self.fTrigger):
             #We must write if we are past the trigger?
 
@@ -48,7 +50,7 @@ class CoCoData(object):
                         self.idxFTrigger -= 1
                     self.fTrigger = min(self.fTrigger, 10 ** (self.idxFTrigger / self.nbptsf))  # TODO: why?
 
-        self.lasteval_num=self.lasteval_num+int(ngen)
+
 
     def sprintData(self, lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol):
         """Format data for printing."""
