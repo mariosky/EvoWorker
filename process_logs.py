@@ -17,7 +17,7 @@ else:
     r = redis.Redis(host=HOST, port=PORT)
 
 
-EXPERIMENT_ID = 25
+EXPERIMENT_ID = 65
 DATA_FOLDER = './experiment_data/' + str(EXPERIMENT_ID) + '/'
 experiment = 'log:test_pop:' + str(EXPERIMENT_ID)
 
@@ -93,17 +93,18 @@ for dim_key, benchmark_group in groupby(data, grp_benchmark):
 
         if buffr:
             f = open(datafile, 'a')
-            f.write('%% function evaluation | noise-free fitness - Fopt'
+            f.write('% function evaluation | noise-free fitness - Fopt'
                     ' () | best noise-free fitness - Fopt | measured '
                     'fitness | best measured fitness | x1 | x2...\n'
                     )
+
 
             f.writelines(buffr)
 
             f.close()
         if hbuffr:
             f = open(hdatafile, 'a')
-            f.write('%% function evaluation | noise-free fitness - Fopt'
+            f.write('% function evaluation | noise-free fitness - Fopt'
                     ' () | best noise-free fitness - Fopt | measured '
                     'fitness | best measured fitness | x1 | x2...\n'
                     )

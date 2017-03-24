@@ -27,6 +27,9 @@ class CoCoData(object):
             #We must write if we are past the trigger?
 
             if self.lasteval_num >= self.evalsTrigger:
+                #In order to pass an assertion in DataSet() we add a fake first eval
+                if not buffr:
+                    buffr.append(self.sprintData(1, algorithm, gen, ngen, fmin, fopt, error, sol))
                 buffr.append(self.sprintData(self.lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol))
 
                 while self.lasteval_num >= np.floor(10 ** (self.idxEvalsTrigger / self.nbptsevals)):
@@ -40,6 +43,8 @@ class CoCoData(object):
 
             # Also if we have a better solution
             if fmin - fopt < self.fTrigger:  # minimization only
+                if not hbuffr:
+                    hbuffr.append(self.sprintData(1, algorithm, gen, ngen, fmin, fopt, error, sol))
                 hbuffr.append(self.sprintData(self.lasteval_num, algorithm, gen, ngen, fmin, fopt, error, sol))
                 if fmin <= fopt:
                     self.fTrigger = -np.inf

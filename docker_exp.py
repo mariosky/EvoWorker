@@ -8,16 +8,16 @@ import json
 
 
 #Set IP of REDIS box. Redis Host is sent to workers so it can not be 127.0.0.1
-REDIS_HOST= 'REDIS_HOST' in os.environ and int(os.environ['REDIS_HOST']) or '192.168.1.13'
+REDIS_HOST= 'REDIS_HOST' in os.environ and int(os.environ['REDIS_HOST']) or '192.168.1.103'
 #Experiment ID must be an integer
-EXPERIMENT_ID = 25
+EXPERIMENT_ID = 65
 
 DATA_ROOT = './experiment_data'
 DATA_FOLDER = './experiment_data/' + str(EXPERIMENT_ID)
 
 
 #for dim in (2,3):
-for dim in (2, 3, 5, 10, 20, 40):
+for dim in (2, 3):
     print "DIM", dim
 
     for instance in range(1,6)+range(41, 51):
