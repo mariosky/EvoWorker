@@ -26,7 +26,7 @@ es_conf = {
 }
 
 
-for function in (4):
+for function in (4,):
 
     for dim in (2, 3, 5, 10, 20, 40):
         print "DIM", dim
