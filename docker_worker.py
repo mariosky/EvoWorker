@@ -39,13 +39,13 @@ def start(cont):
 
 def kill_all():
     for container in get_containers('evo_worker'):
-        print "Killing: ", container
+        #print "Killing: ", container
         container.kill()
 
 
 def remove_all():
     for container in get_containers(all=True):
-        print "Removing: ", container
+        #print "Removing: ", container
         container.remove(force=True)
 
 

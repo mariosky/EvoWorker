@@ -10,7 +10,7 @@ import json
 #Set IP of REDIS box. Redis Host is sent to workers so it can not be 127.0.0.1
 REDIS_HOST= 'REDIS_HOST' in os.environ and os.environ['REDIS_HOST'] or '192.168.1.13'
 #Experiment ID must be an integer
-EXPERIMENT_ID = 904
+EXPERIMENT_ID = 907
 
 DATA_ROOT = './experiment_data'
 DATA_FOLDER = './experiment_data/' + str(EXPERIMENT_ID)
@@ -26,14 +26,16 @@ es_conf = {
 }
 
 
-for function in (4,):
+for function in (7,):
 
     for dim in (2, 3, 5, 10, 20, 40):
         print "DIM", dim
+        print "instance:",
 
         for instance in range(1,6)+range(41, 51):
         #for instance in range(1,3):
-            print "instance", instance
+
+            print instance,
 
             env = {'FUNCTION': function, 'DIM': dim, 'INSTANCE': instance,  'FEmax': 500000,
                    'EVOSPACE_URL': REDIS_HOST + ':3000/evospace', 'POP_NAME': 'test_pop',
@@ -43,9 +45,9 @@ for function in (4,):
 
             info = {'workers': {'GA': {'Number': 1, 'envs': [env]}, 'PSO': {'Number': 1, 'envs': [env]}}}
 
-            print "initializing space"
+            #print "initializing space"
             evospace.initialize(REDIS_HOST + ':3000/evospace','test_pop',env['DIM'],-5,5, es_conf[dim]['EVOSPACE_SIZE'])
-            print dw.get_containers()
+            #print dw.get_containers()
             dw.kill_all()
             dw.remove_all()
 
