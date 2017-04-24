@@ -152,14 +152,14 @@ if __name__ == "__main__":
 
     worker = GA_Worker(conf)
 
-    worker.setup()
+    #worker.setup()
 
     worker.initialize(200)
     for i  in range(conf['max_samples']):
         print i ,
 
         pop = worker.get()
-        pop[0].fitness =  (-2, )
+
         finished, evals,  pop,  best_ind = worker.run(pop)
         print conf['function'],conf['instance'],  worker.function.getfopt(),  best_ind.fitness.values[0],  '%+10.9e'% (best_ind.fitness.values[0] - worker.function.getfopt() + 1e-8)
         worker.put_back(pop)
