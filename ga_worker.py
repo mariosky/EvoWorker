@@ -48,7 +48,16 @@ class GA_Worker:
 
     def get(self):
         self.evospace_sample = self.space.get_sample(self.conf['sample_size'])
-        pop = [creator.Individual(cs['chromosome']) for cs in self.evospace_sample['sample']]
+        #If the individual has been evaluated before, assign the fitness so is not evaluated again
+
+
+        pop = []
+        for cs in self.evospace_sample['sample']:
+            ind = creator.Individual(cs['chromosome'])
+            if 'score' in cs['fitness']:
+               ind.fitness =  creator.FitnessMin(values=(cs['fitness']['score'] ,))
+            pop.append(ind)
+
         return pop
 
     def put_back(self,pop):
@@ -64,16 +73,22 @@ class GA_Worker:
                                                  'benchmark': self.conf['function'], 'instance': self.conf['instance'],
                                                  'worker_id': str(self.worker_uuid), 'experiment_id': experiment_id,
                                                  'dim':self.conf['dim'],
-                                                 'fopt': self.function.getfopt()}
+                                                 'fopt': self.function.getfopt() }
         self.space.put_sample(self.evospace_sample)
 
     def run(self, pop):
         evals = []
+        num_fe = 0
 
         #random.seed(i)
         CXPB, MUTPB, NGEN = random.uniform(.8,1), random.uniform(.1,.6), conf['NGEN']
 
+
+
         # Evaluate the entire population
+
+        invalid_ind = [ind for ind in pop if not ind.fitness.valid]
+        num_fe += len(invalid_ind)
 
         fitnesses = list(map(self.toolbox.evaluate, pop))
         for ind, fit in zip(pop, fitnesses):
@@ -120,14 +135,15 @@ class GA_Worker:
                 ind.fitness.values = fit
 
             #print("  Evaluated %i individuals" % len(invalid_ind))
-            self.FC = self.FC + len(invalid_ind)
+            num_fe = num_fe + len(invalid_ind)
 
             # The population is entirely replaced by the offspring
             pop[:] = offspring
 
             # Gather all the fitnesses in one list and print the stats
             fits = [ind.fitness.values[0] for ind in pop]
-            evals.append((g, min(fits),tools.selBest(pop, 1)[0] ))
+            evals.append((g, min(fits),tools.selBest(pop, 1)[0], num_fe ))
+
 
         best_ind = tools.selBest(pop, 1)[0]
         if (best_ind.fitness.values[0] <= self.function.getfopt() + 1e-8) or self.FC >= self.maximum_function_evaluations:
@@ -152,15 +168,16 @@ if __name__ == "__main__":
 
     worker = GA_Worker(conf)
 
-    #worker.setup()
+    worker.setup()
+
 
     worker.initialize(200)
     for i  in range(conf['max_samples']):
         print i ,
 
         pop = worker.get()
-
         finished, evals,  pop,  best_ind = worker.run(pop)
+        print evals
         print conf['function'],conf['instance'],  worker.function.getfopt(),  best_ind.fitness.values[0],  '%+10.9e'% (best_ind.fitness.values[0] - worker.function.getfopt() + 1e-8)
         worker.put_back(pop)
 

@@ -86,7 +86,15 @@ for dim_key, benchmark_group in groupby(data, grp_benchmark):
             data_row = []
             row_id=0
             for e in row['evals']:
-                data_row.append((e[1], row['algorithm'], e[0],row['params']['sample_size'], e[1],row['fopt'], '%+10.9e'% ( e[1]-row['fopt']),e[2]))
+                # We have to change this to a more practical solution
+
+                num_evals = row['params']['sample_size']
+
+                if len(e) >= 4:
+                    num_evals = e[3]
+
+
+                data_row.append((e[1], row['algorithm'], e[0],num_evals, e[1],row['fopt'], '%+10.9e'% ( e[1]-row['fopt']),e[2]))
                 row_id+=1
             data_row.sort(reverse=True)
             for r in data_row:
