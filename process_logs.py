@@ -17,7 +17,8 @@ else:
     r = redis.Redis(host=HOST, port=PORT)
 
 
-EXPERIMENT_ID = 905
+EXPERIMENT_ID = 9111
+
 DATA_FOLDER = './experiment_data/' + str(EXPERIMENT_ID) + '/'
 experiment = 'log:test_pop:' + str(EXPERIMENT_ID)
 
@@ -75,7 +76,7 @@ for dim_key, benchmark_group in groupby(data, grp_benchmark):
         print  " Instance:" + str(instance_key[1])
 
 
-        coco = CoCoData(dim_key[1])
+        coco = CoCoData(dim_key[1], function= dim_key[0], instance= instance_key[1] )
         index = 0
         total = 0
         buffr = []
