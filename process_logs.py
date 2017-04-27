@@ -17,7 +17,7 @@ else:
     r = redis.Redis(host=HOST, port=PORT)
 
 
-EXPERIMENT_ID = 102
+EXPERIMENT_ID = 10444
 
 DATA_FOLDER = './experiment_data/' + str(EXPERIMENT_ID) + '/'
 experiment = 'log:test_pop:' + str(EXPERIMENT_ID)

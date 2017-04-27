@@ -78,7 +78,8 @@ class GA_Worker:
 
     def run(self, pop):
         evals = []
-        num_fe = 0
+        num_fe_first_sample = 0
+        first_sample = True
 
         #random.seed(i)
         CXPB, MUTPB, NGEN = random.uniform(.8,1), random.uniform(.1,.6), conf['NGEN']
@@ -88,7 +89,7 @@ class GA_Worker:
         # Evaluate the entire population
 
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
-        num_fe += len(invalid_ind)
+        num_fe_first_sample += len(invalid_ind)
 
         fitnesses = list(map(self.toolbox.evaluate, pop))
         for ind, fit in zip(pop, fitnesses):
@@ -102,6 +103,13 @@ class GA_Worker:
 
         # Begin the evolution
         for g in range(NGEN):
+            num_fe = 0
+
+            if first_sample:
+                first_sample = False
+                num_fe+=num_fe_first_sample
+
+
             #print("-- Generation %i --" % g)
 
             # Select the next generation individuals
