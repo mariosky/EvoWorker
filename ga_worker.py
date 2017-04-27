@@ -179,7 +179,7 @@ if __name__ == "__main__":
     worker.setup()
 
 
-    worker.initialize(200)
+    #worker.initialize(200)
     for i  in range(conf['max_samples']):
         print i ,
 
